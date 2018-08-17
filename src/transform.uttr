@@ -1,0 +1,155 @@
+transform
+(xs) = {
+  type: "Program",
+  body: map(statement, xs),
+  sourceType: "script"
+}
+
+statement
+("function":name:params:body) = {
+  type: "FunctionDeclaration",
+  id: eIdentifier(name),
+  params: map(eIdentifier, params),
+  body: eBlockStat(map(statement, body)),
+  generator: false,
+  expression: false,
+  async: false
+},
+(kind:decls)
+| elem(kind, ["var", "const", "let"]) = {
+  type: "VariableDeclaration",
+  declarations: map(
+    [
+      [name, expr] = {
+        type: "VariableDeclarator",
+        id: eIdentifier(name),
+        init: expression(expr)
+      }
+    ],
+    decls),
+  kind
+},
+("block":body) = {
+  type: "BlockStatement",
+  body: map(statement, body)
+},
+["if", test, consequent] = {
+  type: "IfStatement",
+  test: expression(test),
+  consequent: statement(consequent),
+  alternate: null
+},
+["if", test, consequent, alternate] = {
+  type: "IfStatement",
+  test: expression(test),
+  consequent: statement(consequent),
+  alternate: statement(alternate)
+},
+["return", expr] = {
+  type: "ReturnStatement",
+  argument: expression(expr)
+},
+expr = {
+  type: "ExpressionStatement",
+  expression: expression(expr)
+}
+
+expression
+[".", object, property] = {
+  type: "MemberExpression",
+  computed: false,
+  object: expression(object),
+  property: eIdentifier(property)
+},
+["[]", object, property] = {
+  type: "MemberExpression",
+  computed: true,
+  object: expression(object),
+  property: expression(property)
+},
+[op, left, right]
+| elem(op, ["+", "-", "*", "/", "%", "<", ">", "<=", ">=", "==", "!=", "===", "!=="]) = {
+  type: "BinaryExpression",
+  operator: op,
+  left: expression(left),
+  right: expression(right)
+},
+(callee:args)
+| typeOf(args) == "list" = {
+  type: "CallExpression",
+  callee: expression(callee),
+  arguments: map(expression, args)
+},
+ident
+| typeOf(ident) == "string" = eIdentifier(ident),
+{type: "string", value} = {
+  type: "Literal",
+  value,
+  raw: json(value)
+},
+value = {
+  type: "Literal",
+  value,
+  raw: json(value)
+}
+
+
+eIdentifier(name) = {
+  type: "Identifier",
+  name
+}
+
+eBlockStat(body) = {
+  type: "BlockStatement",
+  body: body
+}
+
+
+map
+  (f, x:xs) = f(x):map(f, xs),
+  (_, [])   = []
+
+foldl
+  (f, r:rs)    = foldl(f, r, rs),
+  (f, l, [])   = l,
+  (f, l, r:rs) = foldl(f, f(l, r), rs)
+
+filter
+  (f, [])   = [],
+  (f, x:xs)
+    | f(x)  = x:filter(f, xs)
+    | true  = filter(f, xs)
+
+elem
+  (x, [])   = false,
+  (x, y:ys)
+    | x == y = true
+    | true = elem(x, ys)
+
+length
+  []     = 0,
+  (_:xs) = 1 + length(xs)
+
+concat xs = foldl([(x, y) = x + y], [], xs)
+
+range
+  (end) = range(0, end, 1),
+  (start, end) = range(start, end, 1),
+  (start, end, step)
+    | start < end = start:range(start + step, end, step)
+    | true        = []
+
+zip
+  ([], _) = [],
+  (_, []) = [],
+  (x:xs, y:ys) = [x, y]:zip(xs, ys)
+
+enumerate xs = zip(range(length(xs)), xs)
+
+nub xs = f(xs, [])
+  {
+    f ([], ys) = [],
+      (x:xs, ys)
+        | elem(x, ys) = f(xs, ys)
+        | true        = x:f(xs, x:ys)
+  }
