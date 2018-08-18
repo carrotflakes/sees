@@ -15,6 +15,15 @@ statement
   expression: false,
   async: false
 },
+("function*":name:params:body) = {
+  type: "FunctionDeclaration",
+  id: eIdentifier(name),
+  params: map(eIdentifier, params),
+  body: eBlockStat(map(statement, body)),
+  generator: true,
+  expression: false,
+  async: false
+},
 (kind:decls)
 | elem(kind, ["var", "const", "let"]) = {
   type: "VariableDeclaration",
@@ -45,6 +54,22 @@ statement
   consequent: statement(consequent),
   alternate: statement(alternate)
 },
+("switch":expr:cases) = {
+  type: "SwitchStatement",
+  discriminant: expression(expr),
+  cases: map([
+      ("case":test:consequent) = {
+        type: "SwitchCase",
+        test: expression(test),
+        consequent: map(statement, consequent)
+      },
+      ("default":consequent) = {
+        type: "SwitchCase",
+        test: null,
+        consequent: map(statement, consequent)
+      }
+    ], cases)
+},
 ["return", expr] = {
   type: "ReturnStatement",
   argument: expression(expr)
@@ -73,6 +98,49 @@ expression
   operator: op,
   left: expression(left),
   right: expression(right)
+},
+("@":elements) = {
+  type: "ArrayExpression",
+  elements: map([
+    "." = null,
+    ["...", expr] = {
+      type: "SpreadElement",
+      argument: expression(expr)
+    },
+    expr = expression(expr)
+  ], elements)
+},
+("#":properties) = {
+  type: "ObjectExpression",
+  properties: map([
+    ["...", expr] = {
+      type: "SpreadElement",
+      argument: expression(expr)
+    },
+    [keyExpr, valueExpr] = {
+      type: "Property",
+      key: expression(keyExpr),
+      computed: false,
+      value: expression(valueExpr),
+      kind: "init",
+      method: false,
+      shorthand: false
+    },
+    ident | typeOf(ident) == "string" = {
+      type: "Property",
+      key: eIdentifier(ident),
+      computed: false,
+      value: eIdentifier(ident),
+      kind: "init",
+      method: false,
+      shorthand: true
+    }
+  ], properties)
+},
+("new":callee:args) = {
+  type: "NewExpression",
+  callee: expression(callee),
+  arguments: map(expression, args)
 },
 (callee:args)
 | typeOf(args) == "list" = {

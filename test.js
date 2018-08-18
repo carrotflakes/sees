@@ -23,4 +23,12 @@ compile(`
   (if (<= n 0)
      (return 1)
      (return (* n (fact (- n 1))))))
+(switch a
+  (case 1
+    "one")
+  (default
+    "default"))
+(@ 1 2 . (... a))
+(# (a 1) ("b" 2) (... c))
+(new Error "hoge")
 `);
