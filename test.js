@@ -137,11 +137,17 @@ test('object initializer', () => {
 
 test('destructuring binding', () => {
   expect(sees.compile(`
-(var ((@ a b) c))
+(var ((@ a b (...c)) d))
 `)).toBe(`
-var [
-    a,
-    b
-] = c;
+var [a, b, ...c] = d;
+`.trim());
+  expect(sees.compile(`
+(var ((# (a aa) ("b" bb) c) d))
+`)).toBe(`
+var {
+    a: aa,
+    'b': bb,
+    c
+} = d;
 `.trim());
 });

@@ -31,7 +31,7 @@ statement
     [
       [name, expr] = {
         type: "VariableDeclarator",
-        id: eIdentifier(name),
+        id: pattern(name),
         init: expression(expr)
       }
     ],
@@ -160,6 +160,43 @@ value = {
   value,
   raw: json(value)
 }
+
+pattern
+("@":elements) = {
+  type: "ArrayPattern",
+  elements: map([
+    "." = null,
+    ["...", expr] = {
+      type: "RestElement",
+      argument: pattern(expr)
+    },
+    expr = pattern(expr)
+  ], elements)
+},
+("#":properties) = {
+  type: "ObjectPattern",
+  properties: map([
+    [keyExpr, valueExpr] = {
+      type: "Property",
+      key: expression(keyExpr),
+      computed: false,
+      value: pattern(valueExpr),
+      kind: "init",
+      method: false,
+      shorthand: false
+    },
+    ident | typeOf(ident) == "string" = {
+      type: "Property",
+      key: eIdentifier(ident),
+      computed: false,
+      value: eIdentifier(ident),
+      kind: "init",
+      method: false,
+      shorthand: true
+    }
+  ], properties)
+},
+ident = eIdentifier(ident)
 
 
 eIdentifier(name) = {
