@@ -1,7 +1,5 @@
 # sees
-Sees is an S-expression based AltJS.
-
-## About
+Sees is an AltJS represented as S-expression.
 
 ``` lisp
 (const (hello "Hello!"))
@@ -26,3 +24,5 @@ function fact(n) {
 }
 console.log(fact(5));
 ```
+
+Supported syntax is [here](./test.js)
