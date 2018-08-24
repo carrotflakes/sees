@@ -98,19 +98,23 @@ test('switch statement', () => {
   expect(sees.compile(`
 (switch (+ a b)
   (case 0
-    "0")
+    "0"
+    (break))
   (case 1)
   (case 2
-    "1 or 2")
+    "1 or 2"
+    (break foo))
   (default
     "other"))
 `)).toBe(`
 switch (a + b) {
 case 0:
     '0';
+    break;
 case 1:
 case 2:
     '1 or 2';
+    break foo;
 default:
     'other';
 }

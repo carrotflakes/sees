@@ -89,6 +89,14 @@ statement(macros[callee](args)),
   type: "ReturnStatement",
   argument: expression(expr)
 },
+["break"] = {
+  type: "BreakStatement",
+  label: null
+},
+["break", label] = {
+  type: "BreakStatement",
+  label: eIdentifier(label)
+},
 expr = {
   type: "ExpressionStatement",
   expression: expression(expr)
