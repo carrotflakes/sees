@@ -42,6 +42,19 @@ function add(x, y) {
 `.trim());
 });
 
+test('assignment', () => {
+  expect(sees.compile(`
+(= a 1)
+`)).toBe(`
+a = 1;
+`.trim());
+  expect(sees.compile(`
+(= (@dot a b) (= c 1))
+`)).toBe(`
+a.b = c = 1;
+`.trim());
+});
+
 test('arrow function', () => {
   expect(sees.compile(`
 (=> () 1)

@@ -126,6 +126,12 @@ expression
   object: expression(object),
   property: expression(property)
 },
+["=", left, right] = {
+  type: "AssignmentExpression",
+  operator: "=",
+  left: expression(left),
+  right: expression(right)
+},
 [op, arg]
 | elem(op, ["++@", "--@", "@++", "@--"]) = {
   type: "UpdateExpression",
