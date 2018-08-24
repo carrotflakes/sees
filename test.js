@@ -42,6 +42,22 @@ function add(x, y) {
 `.trim());
 });
 
+test('arrow function', () => {
+  expect(sees.compile(`
+(=> () 1)
+`)).toBe(`
+() => 1;
+`.trim());
+  expect(sees.compile(`
+(=>{} (a b)
+  (return (+ a b)))
+`)).toBe(`
+(a, b) => {
+    return a + b;
+};
+`.trim());
+});
+
 test('if statement', () => {
   expect(sees.compile(`
 (if (<= n 0)

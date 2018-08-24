@@ -1,6 +1,10 @@
 # sees
 Sees is an AltJS represented as S-expression.
 
+## features(aimed)
+- Bijection-able AST mapping
+
+## Translate example
 ``` lisp
 (const (hello "Hello!"))
 

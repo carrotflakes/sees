@@ -80,6 +80,10 @@ expr = {
 }
 
 expression
+("{}":body) = {
+  type: "BlockStatement",
+  body: map(statement, body)
+},
 ["@dot", object, property] = {
   type: "MemberExpression",
   computed: false,
@@ -98,6 +102,24 @@ expression
   operator: op,
   left: expression(left),
   right: expression(right)
+},
+["=>", params, body] = {
+  type: "ArrowFunctionExpression",
+  id: null,
+  params: map(pattern, params),
+  body: expression(body),
+  generator: false,
+  expression: true,
+  async: false
+},
+("=>{}":params:body) = {
+  type: "ArrowFunctionExpression",
+  id: null,
+  params: map(pattern, params),
+  body: eBlockStat(map(statement, body)),
+  generator: false,
+  expression: false,
+  async: false
 },
 ("[":elements) | typeOf(elements) == "list" = {
   type: "ArrayExpression",
