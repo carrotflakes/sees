@@ -38,7 +38,7 @@ statement
     decls),
   kind
 },
-("block":body) = {
+("{}":body) = {
   type: "BlockStatement",
   body: map(statement, body)
 },
@@ -80,7 +80,7 @@ expr = {
 }
 
 expression
-[".", object, property] = {
+["@dot", object, property] = {
   type: "MemberExpression",
   computed: false,
   object: expression(object),
@@ -99,7 +99,7 @@ expression
   left: expression(left),
   right: expression(right)
 },
-("@":elements) = {
+("[":elements) | typeOf(elements) == "list" = {
   type: "ArrayExpression",
   elements: map([
     "." = null,
@@ -110,7 +110,7 @@ expression
     expr = expression(expr)
   ], elements)
 },
-("#":properties) = {
+("{":properties) | typeOf(properties) == "list" = {
   type: "ObjectExpression",
   properties: map([
     ["...", expr] = {
@@ -142,27 +142,34 @@ expression
   callee: expression(callee),
   arguments: map(expression, args)
 },
+["@string", value] = {
+  type: "Literal",
+  value,
+  raw: json(value)
+},
 (callee:args)
 | typeOf(args) == "list" = {
   type: "CallExpression",
   callee: expression(callee),
   arguments: map(expression, args)
 },
-ident
-| typeOf(ident) == "string" = eIdentifier(ident),
-{type: "string", value} = {
+ident | typeOf(ident) == "string" = eIdentifier(ident),
+"undefined" = {
   type: "Literal",
-  value,
-  raw: json(value)
+  value: undefined,
+  raw: "\"undefined\""
 },
 value = {
   type: "Literal",
-  value,
-  raw: json(value)
+  value: v,
+  raw: json(v)
+}
+{
+  v = ["true" = true, "false" = false, "null" = null, x = x](value)
 }
 
 pattern
-("@":elements) = {
+("[":elements) | typeOf(elements) == "list" = {
   type: "ArrayPattern",
   elements: map([
     "." = null,
@@ -173,7 +180,7 @@ pattern
     expr = pattern(expr)
   ], elements)
 },
-("#":properties) = {
+("{":properties) | typeOf(properties) == "list" = {
   type: "ObjectPattern",
   properties: map([
     [keyExpr, valueExpr] = {

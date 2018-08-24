@@ -25,7 +25,7 @@ var a = 1, b = 1, c = 1 + 2;
 
 test('dot operator and function call', () => {
   expect(sees.compile(`
-((. console log) "hello")
+((@dot console log) "hello")
 `)).toBe(`
 console.log('hello');
 `.trim());
@@ -52,7 +52,7 @@ if (n <= 0)
 `.trim());
   expect(sees.compile(`
 (if (<= n 0)
-  (block
+  ({}
     "yo"
     123))
 `)).toBe(`
@@ -63,10 +63,10 @@ if (n <= 0) {
 `.trim());
   expect(sees.compile(`
 (if (<= n 0)
-  (block
+  ({}
     "yo"
     123)
-  (block
+  ({}
     "else..."))
 `)).toBe(`
 if (n <= 0) {
@@ -111,7 +111,7 @@ new Error('foo');
 
 test('array initializer', () => {
   expect(sees.compile(`
-(@ 1 2 . (... a))
+([ 1 2 . (... a))
 `)).toBe(`
 [
     1,
@@ -124,7 +124,7 @@ test('array initializer', () => {
 
 test('object initializer', () => {
   expect(sees.compile(`
-(# (a 1) (b 2) c (... d))
+({ (a 1) (b 2) c (... d))
 `)).toBe(`
 ({
     a: 1,
@@ -137,12 +137,12 @@ test('object initializer', () => {
 
 test('destructuring binding', () => {
   expect(sees.compile(`
-(var ((@ a b (...c)) d))
+(var (([ a b (... c)) d))
 `)).toBe(`
 var [a, b, ...c] = d;
 `.trim());
   expect(sees.compile(`
-(var ((# (a aa) ("b" bb) c) d))
+(var (({ (a aa) ("b" bb) c) d))
 `)).toBe(`
 var {
     a: aa,

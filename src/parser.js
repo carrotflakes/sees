@@ -66,12 +66,8 @@ function parseSymbol(src, start, end) {
   if (i === start)
     throw new Error('parse error');
   const symbol = src.substring(start, i);
-  try {
-    const value = JSON.parse(symbol);
-    return {atom: value, i};
-  } catch (e) {
-    return {atom: symbol, i};
-  }
+  const value = isNaN(symbol) ? symbol : +symbol;
+  return {atom: value, i};
 }
 
 function parseString(src, start, end) {
@@ -84,7 +80,7 @@ function parseString(src, start, end) {
       i++;
   }
   const str = src.substring(start, ++i);
-  const string = {type: 'string', value: JSON.parse(str)};
+  const string = ['@string', JSON.parse(str)];
   return {string, i};
 }
 
