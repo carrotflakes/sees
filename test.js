@@ -173,3 +173,22 @@ function f(a, ...b) {
 }
 `.trim());
 });
+
+test('macro', () => {
+  expect(sees.compile(`
+(@macro -> (base (@dots xs))
+        (return
+          ((@dot xs reduce)
+           (=>{} (x y)
+                 (switch (typeof y)
+                         (case "string"
+                           (return ([ "@dot" x y)))
+                         (case "number")
+                         (case "object"
+                           (return ([ "[]" x y)))))
+           base)))
+(-> foo bar "baz" 0 (-> a b))
+`)).toBe(`
+foo.bar['baz'][0][a.b];
+`.trim());
+});

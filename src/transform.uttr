@@ -1,11 +1,26 @@
 transform
-(xs) = {
+(xs, makeMacro) = {
   type: "Program",
-  body: map(statement, xs),
+  body: transformStatements(xs, {}),
   sourceType: "script"
 }
+{
+  transformStatements
+  (("@macro":name:params:body):xs, macros) =
+  transformStatements(xs, {
+    ...macros,
+    [name]: makeMacro([{expression} = expression](statementWithMacro("=>{}":params:body, macros)))
+  }),
+  (x:xs, macros) = statementWithMacro(x, macros):transformStatements(xs, macros),
+  ([], _) = []
+}
+
+statementWithMacro(x, macros) = statement(x)
+{
 
 statement
+(callee:args) | typeOf(args) == "list" && macros[callee] =
+statement(macros[callee](args)),
 ("function":name:params:body) = {
   type: "FunctionDeclaration",
   id: eIdentifier(name),
@@ -169,6 +184,8 @@ expression
   value,
   raw: json(value)
 },
+(callee:args) | typeOf(args) == "list" && macros[callee] =
+expression(macros[callee](args)),
 (callee:args)
 | typeOf(args) == "list" = {
   type: "CallExpression",
@@ -226,6 +243,8 @@ pattern
   argument: pattern(expr)
 },
 ident = eIdentifier(ident)
+
+}
 
 
 eIdentifier(name) = {
