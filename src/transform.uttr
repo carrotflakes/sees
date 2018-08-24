@@ -164,7 +164,7 @@ expression
   expression: false,
   async: false
 },
-("[":elements) | typeOf(elements) == "list" = {
+("[@]":elements) | typeOf(elements) == "list" = {
   type: "ArrayExpression",
   elements: map([
     "." = null,
@@ -175,7 +175,7 @@ expression
     expr = expression(expr)
   ], elements)
 },
-("{":properties) | typeOf(properties) == "list" = {
+("{@}":properties) | typeOf(properties) == "list" = {
   type: "ObjectExpression",
   properties: map([
     ["@dots", expr] = {
@@ -236,14 +236,14 @@ value = {
 }
 
 pattern
-("[":elements) | typeOf(elements) == "list" = {
+("[@]":elements) | typeOf(elements) == "list" = {
   type: "ArrayPattern",
   elements: map([
     "." = null,
     expr = pattern(expr)
   ], elements)
 },
-("{":properties) | typeOf(properties) == "list" = {
+("{@}":properties) | typeOf(properties) == "list" = {
   type: "ObjectPattern",
   properties: map([
     [keyExpr, valueExpr] = {

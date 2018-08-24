@@ -163,7 +163,7 @@ new Error('foo');
 
 test('array initializer', () => {
   expect(sees.compile(`
-([ 1 2 . (@dots a))
+([@] 1 2 . (@dots a))
 `)).toBe(`
 [
     1,
@@ -176,7 +176,7 @@ test('array initializer', () => {
 
 test('object initializer', () => {
   expect(sees.compile(`
-({ (a 1) (b 2) c (@dots d))
+({@} (a 1) (b 2) c (@dots d))
 `)).toBe(`
 ({
     a: 1,
@@ -189,12 +189,12 @@ test('object initializer', () => {
 
 test('destructuring assignment', () => {
   expect(sees.compile(`
-(var (([ a b (@dots c)) d))
+(var (([@] a b (@dots c)) d))
 `)).toBe(`
 var [a, b, ...c] = d;
 `.trim());
   expect(sees.compile(`
-(var (({ (a aa) ("b" bb) c) d))
+(var (({@} (a aa) ("b" bb) c) d))
 `)).toBe(`
 var {
     a: aa,
@@ -218,10 +218,10 @@ test('macro', () => {
            (=>{} (x y)
                  (switch (typeof y)
                          (case "string"
-                           (return ([ "@dot" x y)))
+                           (return ([@] "@dot" x y)))
                          (case "number")
                          (case "object"
-                           (return ([ "[]" x y)))))
+                           (return ([@] "[]" x y)))))
            base)))
 (-> foo bar "baz" 0 (-> a b))
 `)).toBe(`
