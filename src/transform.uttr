@@ -9,7 +9,7 @@ statement
 ("function":name:params:body) = {
   type: "FunctionDeclaration",
   id: eIdentifier(name),
-  params: map(eIdentifier, params),
+  params: map(pattern, params),
   body: eBlockStat(map(statement, body)),
   generator: false,
   expression: false,
@@ -18,7 +18,7 @@ statement
 ("function*":name:params:body) = {
   type: "FunctionDeclaration",
   id: eIdentifier(name),
-  params: map(eIdentifier, params),
+  params: map(pattern, params),
   body: eBlockStat(map(statement, body)),
   generator: true,
   expression: false,
@@ -103,7 +103,7 @@ expression
   type: "ArrayExpression",
   elements: map([
     "." = null,
-    ["...", expr] = {
+    ["@dots", expr] = {
       type: "SpreadElement",
       argument: expression(expr)
     },
@@ -113,7 +113,7 @@ expression
 ("{":properties) | typeOf(properties) == "list" = {
   type: "ObjectExpression",
   properties: map([
-    ["...", expr] = {
+    ["@dots", expr] = {
       type: "SpreadElement",
       argument: expression(expr)
     },
@@ -173,10 +173,6 @@ pattern
   type: "ArrayPattern",
   elements: map([
     "." = null,
-    ["...", expr] = {
-      type: "RestElement",
-      argument: pattern(expr)
-    },
     expr = pattern(expr)
   ], elements)
 },
@@ -202,6 +198,10 @@ pattern
       shorthand: true
     }
   ], properties)
+},
+["@dots", expr] = {
+  type: "RestElement",
+  argument: pattern(expr)
 },
 ident = eIdentifier(ident)
 

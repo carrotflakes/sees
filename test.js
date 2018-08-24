@@ -111,7 +111,7 @@ new Error('foo');
 
 test('array initializer', () => {
   expect(sees.compile(`
-([ 1 2 . (... a))
+([ 1 2 . (@dots a))
 `)).toBe(`
 [
     1,
@@ -124,7 +124,7 @@ test('array initializer', () => {
 
 test('object initializer', () => {
   expect(sees.compile(`
-({ (a 1) (b 2) c (... d))
+({ (a 1) (b 2) c (@dots d))
 `)).toBe(`
 ({
     a: 1,
@@ -135,9 +135,9 @@ test('object initializer', () => {
 `.trim());
 });
 
-test('destructuring binding', () => {
+test('destructuring assignment', () => {
   expect(sees.compile(`
-(var (([ a b (... c)) d))
+(var (([ a b (@dots c)) d))
 `)).toBe(`
 var [a, b, ...c] = d;
 `.trim());
@@ -149,5 +149,11 @@ var {
     'b': bb,
     c
 } = d;
+`.trim());
+  expect(sees.compile(`
+(function f (a (@dots b)))
+`)).toBe(`
+function f(a, ...b) {
+}
 `.trim());
 });
