@@ -121,6 +121,25 @@ default:
 `.trim());
 });
 
+test('for statement', () => {
+  expect(sees.compile(`
+(for (var (i 0)) (< i 10) (@++ i)
+  (print i))
+`)).toBe(`
+for (var i = 0; i < 10; i++)
+    print(i);
+`.trim());
+  expect(sees.compile(`
+(for () () ()
+  ({}
+   (print i)))
+`)).toBe(`
+for (;;) {
+    print(i);
+}
+`.trim());
+});
+
 test('new operator', () => {
   expect(sees.compile(`
 (new Error "foo")

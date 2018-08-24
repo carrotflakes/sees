@@ -85,6 +85,13 @@ statement(macros[callee](args)),
       }
     ], cases)
 },
+["for", init, test, update, body] = {
+  type: "ForStatement",
+  init: [[] = null, _ = statement(init)](init),
+  test: [[] = null, _ = expression(test)](test),
+  update: [[] = null, _ = expression(update)](update),
+  body: statement(body)
+},
 ["return", expr] = {
   type: "ReturnStatement",
   argument: expression(expr)
@@ -118,6 +125,13 @@ expression
   computed: true,
   object: expression(object),
   property: expression(property)
+},
+[op, arg]
+| elem(op, ["++@", "--@", "@++", "@--"]) = {
+  type: "UpdateExpression",
+  operator: ["++@"="++", "--@"="--", "@++"="++", "@--"="--"](op),
+  argument: expression(arg),
+  prefix: ["++@"=true, "--@"=true, "@++"=false, "@--"=false](op)
 },
 [op, left, right]
 | elem(op, ["+", "-", "*", "/", "%", "<", ">", "<=", ">=", "==", "!=", "===", "!=="]) = {

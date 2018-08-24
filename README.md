@@ -3,6 +3,7 @@ Sees is an AltJS represented as S-expression.
 
 ## features(aimed)
 - Bijection-able AST mapping
+- Lisp-like macro system
 
 ## Translate example
 ``` lisp
